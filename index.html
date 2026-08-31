@@ -1,0 +1,1731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>DemoKit Pre-Booking Management System</title>
+
+    <link rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <link rel="stylesheet" href="style.css">
+</head> 
+
+<body>
+
+<div id="loginScreen" class="login-screen">
+
+    <div class="login-card">
+
+        <div class="login-brand">
+
+            <div class="login-logo">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+
+            <h1>Demo<span>Kit</span></h1>
+
+            <p>
+                Pre-Booking & Lifecycle Management Portal
+            </p>
+
+        </div>
+
+        <div class="role-tabs">
+
+            <button
+                id="adminRoleBtn"
+                class="role-tab active"
+                type="button"
+                onclick="selectRole('admin')">
+
+                <i class="fa-solid fa-user-shield"></i>
+                Admin
+
+            </button>
+
+            <button
+                id="userRoleBtn"
+                class="role-tab"
+                type="button"
+                onclick="selectRole('user')">
+
+                <i class="fa-solid fa-user"></i>
+                User
+
+            </button>
+
+        </div>
+
+        <form id="loginForm">
+
+            <label id="loginIdLabel">
+                Admin User ID
+            </label>
+
+            <input
+                id="loginUsername"
+                type="text"
+                placeholder="Enter Admin User ID"
+                autocomplete="username"
+                required>
+
+            <label>
+                Password
+            </label>
+
+            <div class="password-box">
+
+                <input
+                    id="loginPassword"
+                    type="password"
+                    placeholder="Enter password"
+                    autocomplete="current-password"
+                    required>
+
+                <button
+                    type="button"
+                    onclick="togglePassword()">
+
+                    <i class="fa-solid fa-eye"></i>
+
+                </button>
+
+            </div>
+
+            <div
+                id="loginError"
+                class="error">
+            </div>
+
+            <button
+                class="login-button"
+                type="submit">
+
+                <i class="fa-solid fa-right-to-bracket"></i>
+                Sign In
+
+            </button>
+
+            <button
+                class="forgot-link"
+                type="button"
+                onclick="openForgotModal()">
+
+                Forgot Password?
+
+            </button>
+
+        </form>
+
+
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     APPLICATION
+========================================================= -->
+
+<div id="appContent" class="hidden">
+
+    <!-- HEADER -->
+
+    <header class="topbar">
+
+        <div class="brand">
+
+            <div class="logo">
+                <i class="fa-solid fa-box-open"></i>
+            </div>
+
+            <div>
+
+                <h1>
+                    Demo Kit Management
+                </h1>
+
+                <p>
+                    Inventory · Pre-Booking · Assignment · Cost · Lifecycle
+                </p>
+
+            </div>
+
+        </div>
+
+        <div class="top-actions">
+
+            <span id="roleBadge"></span>
+
+            <span
+                id="currentUserBadge"
+                class="user-chip">
+            </span>
+
+            <button
+                class="btn secondary"
+                onclick="renderAll()">
+
+                <i class="fa-solid fa-rotate"></i>
+                Refresh
+
+            </button>
+
+            <button
+                class="btn logout"
+                onclick="logout()">
+
+                <i class="fa-solid fa-right-from-bracket"></i>
+                Logout
+
+            </button>
+
+        </div>
+
+    </header>
+
+
+    <!-- NAVIGATION -->
+
+    <nav class="tabs">
+
+        <button
+            class="nav-tab active"
+            data-section="dashboard"
+            onclick="showSection('dashboard')">
+
+            <i class="fa-solid fa-chart-pie"></i>
+            Dashboard
+
+        </button>
+
+        <button
+            class="nav-tab"
+            data-section="kits"
+            onclick="showSection('kits')">
+
+            <i class="fa-solid fa-boxes-stacked"></i>
+            Demo Kits
+
+        </button>
+
+        <button
+            class="nav-tab"
+            data-section="booking"
+            onclick="showSection('booking')">
+
+            <i class="fa-solid fa-calendar-check"></i>
+            Pre-Booking
+
+        </button>
+
+        <button
+            class="nav-tab"
+            data-section="requests"
+            onclick="showSection('requests')">
+
+            <i class="fa-solid fa-code-pull-request"></i>
+            Requests
+
+            <span
+                id="requestBadge"
+                class="count-badge">
+                0
+            </span>
+
+        </button>
+
+        <button
+            class="nav-tab admin-only"
+            data-section="users"
+            onclick="showSection('users')">
+
+            <i class="fa-solid fa-users-gear"></i>
+            Users
+
+        </button>
+
+        <button
+            class="nav-tab"
+            data-section="costs"
+            onclick="showSection('costs')">
+
+            <i class="fa-solid fa-indian-rupee-sign"></i>
+            Cost & ROI
+
+        </button>
+
+        <button
+            class="nav-tab admin-only"
+            data-section="logs"
+            onclick="showSection('logs')">
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+            Activity Logs
+
+        </button>
+
+    </nav>
+
+
+    <main>
+
+        <section
+            id="dashboard"
+            class="page-section">
+
+            <div class="welcome-row">
+
+                <div>
+
+                    <h2>
+                        Operational Dashboard
+                    </h2>
+
+                    <p>
+                        Monitor Demo Kit inventory and future reservations.
+                    </p>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button
+                        class="btn primary"
+                        onclick="openBookingModal()">
+
+                        <i class="fa-solid fa-calendar-plus"></i>
+                        Pre-Book Kit
+
+                    </button>
+
+                    <button
+                        class="btn primary admin-only"
+                        onclick="openKitModal()">
+
+                        <i class="fa-solid fa-plus"></i>
+                        New Kit
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="summary">
+
+                <div class="summary-card">
+
+                    <i class="fa-solid fa-boxes-stacked"></i>
+
+                    <div>
+                        <span>Total Kits</span>
+                        <strong id="totalKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card available-card">
+
+                    <i class="fa-solid fa-circle-check"></i>
+
+                    <div>
+                        <span>Available</span>
+                        <strong id="availableKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <i class="fa-solid fa-calendar-check"></i>
+
+                    <div>
+                        <span>Reserved</span>
+                        <strong id="reservedKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card assigned-card">
+
+                    <i class="fa-solid fa-user-check"></i>
+
+                    <div>
+                        <span>Assigned / In Use</span>
+                        <strong id="assignedKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card transport-card">
+
+                    <i class="fa-solid fa-truck"></i>
+
+                    <div>
+                        <span>Transport</span>
+                        <strong id="transportKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card warning-card">
+
+                    <i class="fa-solid fa-screwdriver-wrench"></i>
+
+                    <div>
+                        <span>Maintenance</span>
+                        <strong id="maintenanceKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card danger-card">
+
+                    <i class="fa-solid fa-ban"></i>
+
+                    <div>
+                        <span>Blocked</span>
+                        <strong id="blockedKits">0</strong>
+                    </div>
+
+                </div>
+
+                <div class="summary-card">
+
+                    <i class="fa-solid fa-file-circle-exclamation"></i>
+
+                    <div>
+                        <span>Pending Bookings</span>
+                        <strong id="pendingBookings">0</strong>
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="grid-2">
+
+                <div class="card">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <h3>
+                                Pre-Booking Workflow
+                            </h3>
+
+                            <p>
+                                Movie-ticket-style reservation process
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div class="flow">
+
+                        <span>
+                            Select Kit
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Select Dates
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Check Availability
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Pre-Book
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Admin Approval
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Reserved
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Use
+                        </span>
+
+                        <b>→</b>
+
+                        <span>
+                            Return
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <div class="section-heading">
+
+                        <div>
+
+                            <h3>
+                                Upcoming Reservations
+                            </h3>
+
+                            <p>
+                                Future demo-kit bookings
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    <div id="upcomingBookings"></div>
+
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h3>
+                            Recent Activity
+                        </h3>
+
+                        <p>
+                            Latest system actions
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="recentActivity"
+                    class="activity-list">
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             DEMO KITS
+        ====================================================== -->
+
+        <section
+            id="kits"
+            class="page-section hidden">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Demo Kit Inventory
+                    </h2>
+
+                    <p>
+                        Manage kit availability, cost and lifecycle.
+                    </p>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button
+                        class="btn primary admin-only"
+                        onclick="openKitModal()">
+
+                        <i class="fa-solid fa-plus"></i>
+                        New Demo Kit
+
+                    </button>
+
+                    <button
+                        class="btn secondary"
+                        onclick="downloadKits()">
+
+                        <i class="fa-solid fa-download"></i>
+                        CSV
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card filters">
+
+                <input
+                    id="searchInput"
+                    placeholder="Search Kit ID, serial, model, user...">
+
+                <select id="regionFilter">
+
+                    <option value="ALL">
+                        All Regions
+                    </option>
+
+                    <option>Chennai</option>
+                    <option>Bangalore</option>
+                    <option>Hyderabad</option>
+                    <option>Coimbatore</option>
+
+                </select>
+
+                <select id="statusFilter">
+
+                    <option value="ALL">
+                        All Status
+                    </option>
+
+                    <option>AVAILABLE</option>
+                    <option>RESERVED</option>
+                    <option>ASSIGNED</option>
+                    <option>TRANSPORT</option>
+                    <option>IN_USE</option>
+                    <option>MAINTENANCE</option>
+                    <option>BLOCKED</option>
+
+                </select>
+
+                <select id="categoryFilter">
+
+                    <option value="ALL">
+                        All Categories
+                    </option>
+
+                    <option>Laptop</option>
+                    <option>Mobile</option>
+                    <option>Tablet</option>
+                    <option>IoT</option>
+                    <option>Other</option>
+
+                </select>
+
+            </div>
+
+
+            <div class="card table-card">
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Kit ID</th>
+                                <th>Kit / Model</th>
+                                <th>Serial</th>
+                                <th>Category</th>
+                                <th>Assigned User</th>
+                                <th>Region</th>
+                                <th>Status</th>
+                                <th>Next Booking</th>
+                                <th>Total Cost</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="kitTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             PRE-BOOKING
+        ====================================================== -->
+
+        <section
+            id="booking"
+            class="page-section hidden">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Demo Kit Pre-Booking
+                    </h2>
+
+                    <p>
+                        Select a kit and reserve it for a future date range.
+                    </p>
+
+                </div>
+
+                <button
+                    class="btn primary"
+                    onclick="openBookingModal()">
+
+                    <i class="fa-solid fa-calendar-plus"></i>
+                    Pre-Book Demo Kit
+
+                </button>
+
+            </div>
+
+
+            <div class="booking-search card">
+
+                <div>
+
+                    <label>
+                        Check availability
+                    </label>
+
+                    <div class="date-check">
+
+                        <input
+                            id="calendarFrom"
+                            type="date">
+
+                        <span>to</span>
+
+                        <input
+                            id="calendarTo"
+                            type="date">
+
+                        <button
+                            class="btn primary"
+                            onclick="checkCalendarAvailability()">
+
+                            Check
+
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="availabilityResult"
+                class="availability-result">
+            </div>
+
+
+            <div class="card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h3>
+                            Booking Calendar
+                        </h3>
+
+                        <p>
+                            Green = Available · Red = Reserved · Yellow = Pending
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div
+                    id="bookingCalendar"
+                    class="booking-calendar">
+                </div>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="section-heading">
+
+                    <div>
+
+                        <h3>
+                            My Bookings
+                        </h3>
+
+                        <p>
+                            Your current and previous reservations
+                        </p>
+
+                    </div>
+
+                </div>
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Booking ID</th>
+                                <th>Kit</th>
+                                <th>From</th>
+                                <th>Until</th>
+                                <th>Purpose</th>
+                                <th>Status</th>
+                                <th>Action</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="myBookingTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             REQUESTS
+        ====================================================== -->
+
+        <section
+            id="requests"
+            class="page-section hidden">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Booking Requests
+                    </h2>
+
+                    <p>
+                        Admin approval and reservation management.
+                    </p>
+
+                </div>
+
+                <button
+                    class="btn primary"
+                    onclick="openBookingModal()">
+
+                    <i class="fa-solid fa-plus"></i>
+                    New Booking
+
+                </button>
+
+            </div>
+
+
+            <div class="card table-card">
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Booking ID</th>
+                                <th>User</th>
+                                <th>Kit</th>
+                                <th>From</th>
+                                <th>Until</th>
+                                <th>Purpose</th>
+                                <th>Budget</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="requestTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             USERS
+        ====================================================== -->
+
+        <section
+            id="users"
+            class="page-section hidden admin-only">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        User Access Control
+                    </h2>
+
+                    <p>
+                        Manage users, roles and account status.
+                    </p>
+
+                </div>
+
+                <button
+                    class="btn primary"
+                    onclick="openUserModal()">
+
+                    <i class="fa-solid fa-user-plus"></i>
+                    Create User
+
+                </button>
+
+            </div>
+
+
+            <div class="card table-card">
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>User ID</th>
+                                <th>Name</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Region</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="userTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             COST
+        ====================================================== -->
+
+        <section
+            id="costs"
+            class="page-section hidden">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Cost & ROI Analysis
+                    </h2>
+
+                    <p>
+                        Monitor purchase, transport and maintenance economics.
+                    </p>
+
+                </div>
+
+                <button
+                    class="btn secondary"
+                    onclick="downloadCostReport()">
+
+                    <i class="fa-solid fa-file-excel"></i>
+                    Export Excel
+
+                </button>
+
+            </div>
+
+
+            <div class="cost-cards">
+
+                <div class="metric-card">
+                    <span>Purchase</span>
+                    <strong id="purchaseTotal">₹0</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>Transport</span>
+                    <strong id="transportTotal">₹0</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>Maintenance</span>
+                    <strong id="maintenanceTotal">₹0</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>Other</span>
+                    <strong id="otherTotal">₹0</strong>
+                </div>
+
+                <div class="metric-card highlight">
+                    <span>Total Lifecycle Cost</span>
+                    <strong id="lifecycleTotal">₹0</strong>
+                </div>
+
+                <div class="metric-card">
+                    <span>Estimated Reuse Saving</span>
+                    <strong id="reuseSaving">₹0</strong>
+                </div>
+
+            </div>
+
+
+            <div class="grid-2">
+
+                <div class="card">
+
+                    <h3>
+                        Cost Breakdown
+                    </h3>
+
+                    <div
+                        id="costBars"
+                        class="cost-bars">
+                    </div>
+
+                </div>
+
+
+                <div class="card">
+
+                    <h3>
+                        Repair vs Replace
+                    </h3>
+
+                    <div id="roiTable"></div>
+
+                </div>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             LOGS
+        ====================================================== -->
+
+        <section
+            id="logs"
+            class="page-section hidden admin-only">
+
+            <div class="section-heading">
+
+                <div>
+
+                    <h2>
+                        Activity Log
+                    </h2>
+
+                    <p>
+                        Auditable system history.
+                    </p>
+
+                </div>
+
+                <div class="quick-actions">
+
+                    <button
+                        class="btn primary"
+                        onclick="downloadLogsExcel()">
+
+                        <i class="fa-solid fa-file-excel"></i>
+                        Export Excel
+
+                    </button>
+
+                    <button
+                        class="btn danger"
+                        onclick="clearLogs()">
+
+                        Clear Logs
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <div class="card filters log-filters">
+
+                <input
+                    id="logSearch"
+                    placeholder="Search logs...">
+
+                <select id="logActionFilter">
+
+                    <option value="ALL">
+                        All Actions
+                    </option>
+
+                </select>
+
+            </div>
+
+
+            <div class="card table-card">
+
+                <div class="table-container">
+
+                    <table>
+
+                        <thead>
+
+                            <tr>
+
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>User</th>
+                                <th>Kit / Booking</th>
+                                <th>Action</th>
+                                <th>Details</th>
+
+                            </tr>
+
+                        </thead>
+
+                        <tbody id="logTable"></tbody>
+
+                    </table>
+
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+
+<!-- =========================================================
+     KIT MODAL
+========================================================= -->
+
+<div id="kitModal" class="modal">
+
+    <div class="modal-box wide">
+
+        <div class="modal-title">
+
+            <h2 id="kitModalTitle">
+                New Demo Kit
+            </h2>
+
+            <button onclick="closeModal('kitModal')">
+                &times;
+            </button>
+
+        </div>
+
+
+        <form
+            id="kitForm"
+            class="form-grid">
+
+            <input
+                id="kitId"
+                type="hidden">
+
+            <div>
+
+                <label>Kit Name</label>
+
+                <input
+                    id="kitName"
+                    required>
+
+            </div>
+
+
+            <div>
+
+                <label>Serial Number</label>
+
+                <input
+                    id="serialNumber"
+                    required>
+
+            </div>
+
+
+            <div>
+
+                <label>Model</label>
+
+                <input
+                    id="model"
+                    required>
+
+            </div>
+
+
+            <div>
+
+                <label>Category</label>
+
+                <select id="category">
+
+                    <option>Laptop</option>
+                    <option>Mobile</option>
+                    <option>Tablet</option>
+                    <option>IoT</option>
+                    <option>Other</option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Home Region</label>
+
+                <select id="homeRegion">
+
+                    <option>Chennai</option>
+                    <option>Bangalore</option>
+                    <option>Hyderabad</option>
+                    <option>Coimbatore</option>
+
+                </select>
+
+            </div>
+
+
+            <div>
+
+                <label>Purchase Cost (₹)</label>
+
+                <input
+                    id="purchaseCost"
+                    type="number"
+                    min="0"
+                    value="0">
+
+            </div>
+
+
+            <div>
+
+                <label>Accessories Cost (₹)</label>
+
+                <input
+                    id="accessoriesCost"
+                    type="number"
+                    min="0"
+                    value="0">
+
+            </div>
+
+
+            <div>
+
+                <label>Other Cost (₹)</label>
+
+                <input
+                    id="otherCost"
+                    type="number"
+                    min="0"
+                    value="0">
+
+            </div>
+
+
+            <div>
+
+                <label>Purchase Date</label>
+
+                <input
+                    id="purchaseDate"
+                    type="date">
+
+            </div>
+
+
+            <div class="full-span">
+
+                <label>Notes</label>
+
+                <textarea
+                    id="kitNotes"
+                    rows="3">
+                </textarea>
+
+            </div>
+
+
+            <div class="full-span">
+
+                <button
+                    class="btn primary full"
+                    type="submit">
+
+                    <i class="fa-solid fa-save"></i>
+                    Save Demo Kit
+
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     BOOKING MODAL
+========================================================= -->
+
+<div id="bookingModal" class="modal">
+
+    <div class="modal-box wide">
+
+        <div class="modal-title">
+
+            <h2>
+                Pre-Book Demo Kit
+            </h2>
+
+            <button onclick="closeModal('bookingModal')">
+                &times;
+            </button>
+
+        </div>
+
+
+        <div class="booking-information">
+
+            <i class="fa-solid fa-ticket"></i>
+
+            <div>
+
+                <strong>
+                    Movie-Ticket-Style Reservation
+                </strong>
+
+                <p>
+                    Select your kit, booking period and purpose.
+                    The system automatically prevents overlapping bookings.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <form id="bookingForm">
+
+            <label>
+                Demo Kit
+            </label>
+
+            <select
+                id="bookingKit"
+                required
+                onchange="updateBookingKitInfo()">
+            </select>
+
+
+            <div
+                id="selectedKitInfo"
+                class="selected-kit-info">
+            </div>
+
+
+            <div class="form-grid">
+
+                <div>
+
+                    <label>
+                        Booking From
+                    </label>
+
+                    <input
+                        id="bookingFrom"
+                        type="date"
+                        required
+                        onchange="validateBookingDates()">
+
+                </div>
+
+
+                <div>
+
+                    <label>
+                        Booking Until
+                    </label>
+
+                    <input
+                        id="bookingUntil"
+                        type="date"
+                        required
+                        onchange="validateBookingDates()">
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="bookingAvailability"
+                class="booking-availability">
+            </div>
+
+
+            <label>
+                Customer / Company
+            </label>
+
+            <input
+                id="bookingCustomer"
+                placeholder="Customer or company name"
+                required>
+
+
+            <label>
+                Purpose
+            </label>
+
+            <input
+                id="bookingPurpose"
+                placeholder="Example: Customer product demonstration"
+                required>
+
+
+            <label>
+                Region
+            </label>
+
+            <select id="bookingRegion">
+
+                <option>Chennai</option>
+                <option>Bangalore</option>
+                <option>Hyderabad</option>
+                <option>Coimbatore</option>
+
+            </select>
+
+
+            <label>
+                Budget (₹)
+            </label>
+
+            <input
+                id="bookingBudget"
+                type="number"
+                min="0"
+                value="0">
+
+
+            <label>
+                Remarks
+            </label>
+
+            <textarea
+                id="bookingRemarks"
+                rows="3"
+                placeholder="Additional booking information">
+            </textarea>
+
+
+            <button
+                id="preBookButton"
+                class="btn primary full"
+                type="submit">
+
+                <i class="fa-solid fa-calendar-check"></i>
+                Check & Pre-Book
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     USER MODAL
+========================================================= -->
+
+<div id="userModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+
+            <h2>
+                Create User
+            </h2>
+
+            <button onclick="closeModal('userModal')">
+                &times;
+            </button>
+
+        </div>
+
+
+        <form id="userForm">
+
+            <label>
+                Full Name
+            </label>
+
+            <input
+                id="newUserName"
+                required>
+
+
+            <label>
+                Email
+            </label>
+
+            <input
+                id="newUserEmail"
+                type="email"
+                required>
+
+
+            <label>
+                User ID
+            </label>
+
+            <input
+                id="newUserId"
+                placeholder="Example: user2"
+                required>
+
+
+            <label>
+                Role
+            </label>
+
+            <select id="newUserRole">
+
+                <option value="user">
+                    User
+                </option>
+
+                <option value="manager">
+                    Manager
+                </option>
+
+            </select>
+
+
+            <label>
+                Region
+            </label>
+
+            <select id="newUserRegion">
+
+                <option>Chennai</option>
+                <option>Bangalore</option>
+                <option>Hyderabad</option>
+                <option>Coimbatore</option>
+
+            </select>
+
+
+            <label>
+                Temporary Password
+            </label>
+
+            <input
+                id="newUserPassword"
+                type="password"
+                minlength="6"
+                required>
+
+
+            <button
+                class="btn primary full"
+                type="submit">
+
+                <i class="fa-solid fa-user-plus"></i>
+                Create Account
+
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     FORGOT PASSWORD
+========================================================= -->
+
+<div id="forgotModal" class="modal">
+
+    <div class="modal-box">
+
+        <div class="modal-title">
+
+            <h2>
+                Password Recovery
+            </h2>
+
+            <button onclick="closeModal('forgotModal')">
+                &times;
+            </button>
+
+        </div>
+
+
+        <div id="forgotStep1">
+
+            <p class="muted">
+                Enter your registered email.
+            </p>
+
+            <label>
+                Email
+            </label>
+
+            <input
+                id="forgotEmail"
+                type="email"
+                required>
+
+
+            <button
+                class="btn primary full"
+                onclick="sendResetCode()">
+
+                Generate Reset Code
+
+            </button>
+
+        </div>
+
+
+        <div
+            id="forgotStep2"
+            class="hidden">
+
+            <div class="otp-box">
+
+                Demo reset code:
+                <strong id="demoOtp"></strong>
+
+            </div>
+
+
+            <label>
+                OTP
+            </label>
+
+            <input
+                id="resetOtp"
+                maxlength="6">
+
+
+            <label>
+                New Password
+            </label>
+
+            <input
+                id="resetPassword"
+                type="password"
+                minlength="6">
+
+
+            <label>
+                Confirm Password
+            </label>
+
+            <input
+                id="resetPassword2"
+                type="password"
+                minlength="6">
+
+
+            <button
+                class="btn primary full"
+                onclick="resetPassword()">
+
+                Reset Password
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+<div id="toastContainer"></div>
+
+
+<script
+    src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js">
+</script>
+
+<script src="script.js"></script>
+
+</body>
+</html>
