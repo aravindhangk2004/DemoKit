@@ -1,0 +1,25 @@
+{
+  "name": "demokit",
+  "version": "1.0.0",
+  "private": true,
+  "description": "DemoKit Pre-Booking & Lifecycle Management Portal",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-sqlite3": "^0.9.17",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "express-rate-limit": "^8.0.1",
+    "express-session": "^1.18.2",
+    "helmet": "^8.1.0",
+    "sqlite3": "^5.1.7",
+    "nodemailer": "^7.0.5"
+  }
+}
